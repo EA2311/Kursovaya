@@ -1,14 +1,13 @@
 package models;
 
-import javafx.beans.property.SimpleStringProperty;
-
 public class Products {
-    private String code;
-    private String name;
-    private int price;
-    private String size;
-    private String deskr;
-    private int amount;
+
+    protected String code;
+    protected String name;
+    protected int price;
+    protected String size;
+    protected String deskr;
+    protected int amount;
 
 
     public void Products(){}

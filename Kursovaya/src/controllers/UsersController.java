@@ -9,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
@@ -17,7 +16,6 @@ import javafx.stage.Stage;
 import models.Users;
 import sample.DatabaseHandler;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Optional;
@@ -39,10 +37,11 @@ public class UsersController {
     @FXML
     private Button deleteBtn;
 
-    private Users delUser;
+    private Users delUser = new Users();
 
     @FXML
-    private void initialize(){
+    private void initialize() throws SQLException {
+        getSalary();
         showInfo();
         menuBtn.setOnAction(event -> {
             Stage stage = (Stage) menuBtn.getScene().getWindow();
@@ -70,13 +69,22 @@ public class UsersController {
             alert.showAndWait();
         });
         deleteBtn.setOnAction(event -> {
-            try {
-                delete();
-                showInfo();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            } catch (ClassNotFoundException e) {
-                e.printStackTrace();
+            if(delUser.getUsername() == null) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка!");
+                alert.setHeaderText(null);
+                alert.setContentText("Сначала выберите пользователя!");
+                alert.showAndWait();
+            }
+            else {
+                try {
+                    delete();
+                    showInfo();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -88,6 +96,7 @@ public class UsersController {
         try {
             while (result.next()) {
                 Users user = new Users();
+
                 user.setUserId(result.getInt(1));
                 user.setUsername(result.getString(2));
                 user.setPassword(result.getString(3));
@@ -95,6 +104,7 @@ public class UsersController {
                 user.setAdres(result.getString(5));
                 user.setName(result.getString(6));
                 user.setSurname(result.getString(7));
+                user.setSalary(result.getString(9));
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -133,15 +143,19 @@ public class UsersController {
         surnameCol.setCellValueFactory(new PropertyValueFactory<Users, String>("surname"));
         tableView.getColumns().add(surnameCol);
 
+        TableColumn<Users, String> salaryCol = new TableColumn<Users, String>("% от продаж за текущий месяц");
+        salaryCol.setCellValueFactory(new PropertyValueFactory<Users, String>("salary"));
+        tableView.getColumns().add(salaryCol);
+
         TableView.TableViewSelectionModel<Users> selectionModel = tableView.getSelectionModel();
         selectionModel.selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null){
                 delUser = newValue;
             }
-            //System.out.println(sellProduct.toString());
         });
         prodPane.getChildren().add(tableView);
     }
+
     public void delete() throws SQLException, ClassNotFoundException {
         Alert alert1 = new Alert(Alert.AlertType.CONFIRMATION);
         alert1.setTitle("Подтвердите ваше действие");
@@ -159,5 +173,16 @@ public class UsersController {
             alert.showAndWait();
         }
 
+    }
+
+    public void getSalary() throws SQLException {
+        DatabaseHandler dbHandler = new DatabaseHandler();
+        ResultSet resultSet = dbHandler.forSalary();
+        while (resultSet.next()){
+            Users user = new Users();
+            user.setSalary(resultSet.getString(1));
+            user.setUsername(resultSet.getString(2));
+            dbHandler.insertSalary(user);
+        }
     }
 }

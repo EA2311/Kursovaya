@@ -1,13 +1,10 @@
 package sample;
 import controllers.LogController;
-import javafx.scene.control.Alert;
 import models.Products;
-import models.SoldProducts;
 import models.Users;
 import java.text.SimpleDateFormat;
 import java.sql.*;
 import java.util.Date;
-import models.Users;
 
 public class DatabaseHandler extends Configs {
     Connection dbConnection = null;
@@ -21,6 +18,20 @@ public class DatabaseHandler extends Configs {
         dbConnection = DriverManager.getConnection(connectionString, dbUser, dbPass);
 
         return dbConnection;
+    }
+
+    public ResultSet firstEntry(){
+        ResultSet resultSet = null;
+        String select = "SELECT * FROM admins";
+
+        try {
+            Statement stat = getDbConnection().createStatement();
+            resultSet = stat.executeQuery(select);
+            getDbConnection().close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return resultSet;
     }
 
     public void registerUser(Users user) {
@@ -126,7 +137,6 @@ public class DatabaseHandler extends Configs {
             prSt.setInt(1, product.getAmount()-1);
             prSt.setString(2, product.getCode());
 
-
             prSt.executeUpdate();
         }else {
             try {
@@ -176,14 +186,11 @@ public class DatabaseHandler extends Configs {
         if(i>=1){
         String update = "UPDATE products SET amount = amount + ? WHERE code = ?";
             try {
-
                 PreparedStatement prSt = getDbConnection().prepareStatement(update);
                 prSt.setInt(1, product.getAmount());
                 prSt.setString(2, product.getCode());
-
                 prSt.executeUpdate();
                 getDbConnection().close();
-
             } catch (SQLException |
                     ClassNotFoundException e) {
                 e.printStackTrace();
@@ -192,7 +199,6 @@ public class DatabaseHandler extends Configs {
         else {
             String insert = "INSERT INTO products (code, name, price, size, description, amount)VALUES(?,?,?,?,?,?)";
             try {
-
                 PreparedStatement prSt = getDbConnection().prepareStatement(insert);
                 prSt.setString(1, product.getCode());
                 prSt.setString(2, product.getName());
@@ -200,10 +206,8 @@ public class DatabaseHandler extends Configs {
                 prSt.setString(4, product.getSize());
                 prSt.setString(5, product.getDeskr());
                 prSt.setInt(6, product.getAmount());
-
                 prSt.executeUpdate();
                 getDbConnection().close();
-
             } catch (SQLException |
                     ClassNotFoundException e) {
                 e.printStackTrace();
@@ -283,7 +287,7 @@ public class DatabaseHandler extends Configs {
         return resultSet;
     }
 
-    public ResultSet forStat(/*int month*/){
+    public ResultSet forStat(){
         ResultSet resultSet = null;
        // String select = "SELECT price FROM soldout WHERE month(date) = ? and year(date)=year(now())";
         String select = "SELECT SUM(price), DATE_FORMAT(`date`, '%m') as period FROM soldout WHERE year(date)=year(now()) GROUP BY period";
@@ -300,4 +304,43 @@ public class DatabaseHandler extends Configs {
         }
         return resultSet;
     }
+
+    public ResultSet forSalary(){
+        ResultSet resultSet = null;
+        String select = "SELECT SUM(price), seller FROM kursovaya.soldout WHERE year(date)=year(now()) and month(date)=month(now()) GROUP BY seller";
+        try {
+            Statement statement = getDbConnection().createStatement();
+            resultSet = statement.executeQuery(select);
+            getDbConnection().close();
+        } catch (SQLException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+        return resultSet;
+    }
+
+    public void insertSalary(Users user){
+        String update = "UPDATE users SET salary = ? WHERE username = ?";
+        try {
+            int salary = Integer.parseInt(user.getSalary())/100 * 3;
+            PreparedStatement prSt = getDbConnection().prepareStatement(update);
+            prSt.setString(1, Integer.toString(salary));
+            prSt.setString(2, user.getUsername());
+
+            prSt.executeUpdate();
+            getDbConnection().close();
+
+        } catch (SQLException |
+                ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ResultSet getStat() throws SQLException, ClassNotFoundException {
+        String amount = "SELECT SUM(amount) FROM kursovaya.products";
+        Statement stat = getDbConnection().createStatement();
+        ResultSet resultSet = stat.executeQuery(amount);
+        getDbConnection().close();
+        return resultSet;
+    }
+
 }

@@ -12,7 +12,6 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Products;
 import sample.DatabaseHandler;
-
 import java.io.IOException;
 
 public class AddController {

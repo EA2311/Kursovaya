@@ -9,12 +9,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Users;
 import sample.DatabaseHandler;
-
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,9 +47,8 @@ public class LogController {
 
     @FXML
     void initialize() {
-
-        //Кнопка входа в аккаунт
-        enterBtn.setOnMouseClicked(event -> {
+    check = false;
+    enterBtn.setOnMouseClicked(event -> {
             String loginText = logField.getText().trim();
             String passwordText = pasField.getText().trim();
             seller = loginText;
@@ -76,7 +73,6 @@ public class LogController {
         });
 
     }
-
 
     private void logInUser(String loginText, String passwordText, boolean check) {
         DatabaseHandler dbHandler = new DatabaseHandler();
@@ -104,7 +100,6 @@ public class LogController {
             e.printStackTrace();
         }
         if (counter >= 1) {
-            //if(loginText.equals(user.getUsername())&&passwordText.equals(user.getPassword()))
             newScene("../view/menu.fxml", "SalesManager");
         }
         else {

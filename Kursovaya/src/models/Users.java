@@ -9,22 +9,17 @@ public class Users {
     private String name;
     private String surname;
     private String func;
+    private String salary;
 
-    public Users(int userId, String username, String password, String telephone, String adres, String name, String surname, String func) {
-        this.userId = userId;
-        this.username = username;
-        this.password = password;
-        this.telephone = telephone;
-        this.adres = adres;
-        this.name = name;
-        this.surname = surname;
-        this.func = func;
+    public Users() {}
+
+    public String getSalary() {
+        return salary;
     }
 
-    public Users() {
-
+    public void setSalary(String salary) {
+        this.salary = salary;
     }
-
 
     public int getUserId() {
         return userId;

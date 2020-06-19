@@ -1,7 +1,5 @@
 package controllers;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -13,13 +11,10 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.Products;
-import models.SoldProducts;
 import sample.DatabaseHandler;
-
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -46,9 +41,6 @@ public class ProductsController {
 
     public void initialize(){
         getProducts();
-
-        //sellProduct(tableView);
-
         menuBtn.setOnAction(event -> {
             Stage stage = (Stage) menuBtn.getScene().getWindow();
             stage.close();
@@ -69,7 +61,14 @@ public class ProductsController {
         });
 
         sellBtn.setOnAction(event -> {
-            sellProducts();
+            if(sellProduct.getCode() == null){
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Ошибка!");
+                alert.setHeaderText(null);
+                alert.setContentText("Ошибка! Сначала выберите товар для продажи!");
+                alert.showAndWait();
+            }
+            else sellProducts();
         });
 
         helpBtn.setOnAction(event -> {
@@ -84,10 +83,6 @@ public class ProductsController {
 
     private void getProducts() {
         DatabaseHandler dbHandler = new DatabaseHandler();
-       // int n = 100;
-        //Products[] products;
-       // products = new Products[n];
-        //int i = 0;
         ResultSet result = dbHandler.getProduct("products", 0);
         ObservableList<Products> prod = FXCollections.observableArrayList();
 
@@ -103,9 +98,6 @@ public class ProductsController {
                 products.setAmount(result.getInt(6));
 
                 prod.add(products);
-
-                //System.out.println(products);
-               // ++i;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -151,7 +143,6 @@ public class ProductsController {
                     if (newValue != null){
                         sellProduct = newValue;
                     }
-                        //System.out.println(sellProduct.toString());
                 });
 
         prodPane.getChildren().add(tableView);

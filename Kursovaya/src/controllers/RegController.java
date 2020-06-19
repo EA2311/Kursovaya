@@ -84,6 +84,7 @@ public class RegController {
 
     @FXML
     private Button regBtn11;
+
     @FXML
     private void initialize(){
 
@@ -118,12 +119,16 @@ public class RegController {
             }
             else {
                 String loginText = regLogField.getText().trim();
-                checkUser(loginText);
+                try {
+                    checkUser(loginText);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
 
-    private void regNewUser() {
+    private void regNewUser() throws SQLException {
         DatabaseHandler dbHandler = new DatabaseHandler();
 
         String username = regLogField.getText();
@@ -133,7 +138,44 @@ public class RegController {
         String name = regNamField.getText();
         String surname = regSurnField.getText();
         String func;
-        if(admRadioBtn.isSelected()){
+        if(!checkFirstReg()){
+            admRadioBtn.setSelected(true);
+            Users user2 = new Users();
+            user2.setUsername(username);
+            user2.setPassword(password);
+            user2.setTelephone(telephone);
+            user2.setAdres(adres);
+            user2.setName(name);
+            user2.setSurname(surname);
+            user2.setFunc("Админ");
+
+            DatabaseHandler dbHandler1 = new DatabaseHandler();
+            dbHandler1.registerUser(user2);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Поздравляем!");
+            alert.setHeaderText(null);
+            alert.setContentText("Регистрация прошла успешно!");
+            alert.showAndWait();
+
+            regBtn.getScene().getWindow().hide();
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(getClass().getResource("/view/logIn.fxml"));
+            try {
+                loader.load();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            Parent root = loader.getRoot();
+            Stage stage = new Stage();
+            stage.setScene(new Scene(root));
+            stage.initModality(Modality.WINDOW_MODAL);
+            stage.setTitle("SalesManager");
+            stage.setResizable(false);
+            stage.getIcons().add(new Image(MenuController.class.getResourceAsStream("/resources/journal.png")));
+            stage.showAndWait();
+        }
+       else  if(admRadioBtn.isSelected()){
             admPane.setVisible(true);
             regBtn1.setOnAction(event -> {
                 DatabaseHandler dbHandler1 = new DatabaseHandler();
@@ -161,8 +203,6 @@ public class RegController {
                     e.printStackTrace();
                 }
                 if (counter >= 1) {
-                    //func = "Админ";
-
                     Users user2 = new Users();
                     user2.setUsername(username);
                     user2.setPassword(password);
@@ -212,44 +252,6 @@ public class RegController {
 
         }
         else {
-            /*
-            //func ="Пользователь";
-            Users user = new Users();
-            user.setUsername(username);
-            user.setPassword(password);
-            user.setTelephone(telephone);
-            user.setAdres(adres);
-            user.setName(name);
-            user.setSurname(surname);
-            user.setFunc("Пользователь");
-
-            dbHandler.registerUser(user);
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Поздравляем!");
-            alert.setHeaderText(null);
-            alert.setContentText("Регистрация прошла успешно!");
-            alert.showAndWait();
-
-            regBtn.getScene().getWindow().hide();
-            FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(getClass().getResource("/view/logIn.fxml"));
-
-            try {
-                loader.load();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            Parent root = loader.getRoot();
-            Stage stage = new Stage();
-            stage.setScene(new Scene(root));
-            stage.initModality(Modality.WINDOW_MODAL);
-            stage.setTitle("SalesManager");
-            stage.setResizable(false);
-            stage.getIcons().add(new Image(MenuController.class.getResourceAsStream("/resources/journal.png")));
-            stage.showAndWait();
-
-             */
             admPane.setVisible(true);
             regBtn1.setOnAction(event -> {
                 DatabaseHandler dbHandler1 = new DatabaseHandler();
@@ -277,8 +279,6 @@ public class RegController {
                     e.printStackTrace();
                 }
                 if (counter >= 1) {
-                    //func = "Админ";
-
                     Users user2 = new Users();
                     user2.setUsername(username);
                     user2.setPassword(password);
@@ -329,7 +329,7 @@ public class RegController {
         }
     }
 
-    private void checkUser(String loginText){
+    private void checkUser(String loginText) throws SQLException {
         DatabaseHandler dbHandler = new DatabaseHandler();
         Users user = new Users();
         user.setUsername(loginText);
@@ -362,5 +362,11 @@ public class RegController {
         else {
             regNewUser();
         }
+    }
+
+    private boolean checkFirstReg() throws SQLException {
+        DatabaseHandler dbHandler = new DatabaseHandler();
+        ResultSet resultSet = dbHandler.firstEntry();
+        return resultSet.next();
     }
 }

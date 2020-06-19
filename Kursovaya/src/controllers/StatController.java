@@ -10,21 +10,16 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Pane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import sample.DatabaseHandler;
-
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.Reader;
-import java.math.BigDecimal;
-import java.net.URL;
 import java.sql.*;
-import java.util.Calendar;
-import java.util.Map;
+
 
 public class StatController {
 
@@ -50,7 +45,11 @@ public class StatController {
     private Button menuBtn;
 
     @FXML
-    public void initialize() throws SQLException {
+    private Label amountLbl;
+
+
+    @FXML
+    public void initialize() throws SQLException, ClassNotFoundException {
         showStat();
         menuBtn.setOnAction(event -> {
             Stage stage = (Stage) menuBtn.getScene().getWindow();
@@ -74,20 +73,17 @@ public class StatController {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Помощь");
             alert.setHeaderText(null);
-            alert.setContentText("Данная страница предназначена для просмотра ");
+            alert.setContentText("Данная страница предназначена для просмотра статистики продаж по месяцам текущего года, а также для просмотра кол-ва единиц товаров в наличии.");
             alert.showAndWait();
 
         });
     }
 
-    private void showStat() throws SQLException {
+    private void showStat() throws SQLException, ClassNotFoundException {
         DatabaseHandler handler = new DatabaseHandler();
         ResultSet result;
         String month = "";
-        //int sum = 0;
-
-       // for (int i = 1; i < 13; i++) {
-            int sum = 0;
+        int sum = 0;
         result = handler.forStat();
         XYChart.Series set1 = new XYChart.Series<>();
         while (result.next()) {
@@ -138,5 +134,8 @@ public class StatController {
 
         }
         barChart.getData().addAll(set1);
+        result = handler.getStat();
+        while (result.next())
+        amountLbl.setText(String.valueOf(result.getInt(1)));
     }
 }

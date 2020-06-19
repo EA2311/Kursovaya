@@ -15,14 +15,11 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.Image;
 import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.Pane;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import models.SoldProducts;
 import sample.DatabaseHandler;
-
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,6 +52,7 @@ public class SoldOutController {
     private Button helpBtn;
 
     private int monthNum = 0;
+
     private  TableView<SoldProducts> tableView;
 
     public void initialize() throws ParseException {
@@ -141,10 +139,6 @@ public class SoldOutController {
 
     private void getSoldProducts(int i) throws ParseException {
         DatabaseHandler dbHandler = new DatabaseHandler();
-        // int n = 100;
-        //Products[] products;
-        // products = new Products[n];
-        //int i = 0;
         ResultSet result = dbHandler.getProduct("soldout" ,i);
         ObservableList<SoldProducts> prod = FXCollections.observableArrayList();
 
@@ -160,18 +154,10 @@ public class SoldOutController {
                 products.setSize(result.getString(4));
                 products.setAmount(result.getInt(5));
                 products.setDeskr(result.getString(6));
-                //products.setAmount(result.getInt(6));
                 products.setSeller(result.getString(7));
                 products.setDate(result.getString(8));
-                /*
-                String dateStr = products.getDate();
-                Date date = formatForDateNow.parse(dateStr);
-                dateStr = formatForDateNow.format(date);
-                products.setDate(dateStr);
-                 */
+
                 prod.add(products);
-                //System.out.println(products);
-                // ++i;
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -182,12 +168,9 @@ public class SoldOutController {
         tableView.setLayoutX(0);
         tableView.setLayoutY(0);
         tableView.setStyle("-fx-selection-bar: #9ACD50; -fx-selection-bar-non-focused: #9ACD70;");
-        //tableView.setStyle("-fx-background-color:  #9ACD32");
 
         TableColumn<SoldProducts, String> codeCol = new TableColumn<SoldProducts, String>("Артикул");
         codeCol.setCellValueFactory(new PropertyValueFactory<SoldProducts, String>("code"));
-        //codeCol.setStyle("-fx-text-fill: red");
-        //codeCol.setStyle("-fx-background-color:  #9ACD32;-fx-opacity: 0.7");
         tableView.getColumns().add(codeCol);
 
         TableColumn<SoldProducts, String> nameCol = new TableColumn<SoldProducts, String>("Наименование");
@@ -201,11 +184,7 @@ public class SoldOutController {
         TableColumn<SoldProducts, String> sizeCol = new TableColumn<SoldProducts, String>("Размер");
         sizeCol.setCellValueFactory(new PropertyValueFactory<SoldProducts, String>("size"));
         tableView.getColumns().add(sizeCol);
-/*
-        TableColumn<SoldProducts, String> amountCol = new TableColumn<SoldProducts, String>("Кол-во");
-        amountCol.setCellValueFactory(new PropertyValueFactory<SoldProducts, String>("amount"));
-        tableView.getColumns().add(amountCol);
-*/
+
         TableColumn<SoldProducts, String> deskrCol = new TableColumn<SoldProducts, String>("Описание");
         deskrCol.setCellValueFactory(new PropertyValueFactory<SoldProducts, String>("deskr"));
         tableView.getColumns().add(deskrCol);
@@ -218,9 +197,6 @@ public class SoldOutController {
         dateCol.setCellValueFactory(new PropertyValueFactory<SoldProducts, String>("date"));
         tableView.getColumns().add(dateCol);
 
-       // tableView.resizeColumn(nameCol, 120);
-        //tableView.resizeColumn(deskrCol, 320);
-
         TableView.TableViewSelectionModel<SoldProducts> selectionModel = tableView.getSelectionModel();
 
         prodPane.getChildren().add(tableView);
@@ -228,7 +204,6 @@ public class SoldOutController {
 
     private void pdf(){
             try {
-                    //monthNum = Integer.parseInt(month);
                     if(monthNum>12 || monthNum<1){
                         Alert alert = new Alert(Alert.AlertType.INFORMATION);
                         alert.setTitle("Ошибка");
@@ -295,8 +270,6 @@ public class SoldOutController {
                         alert.setHeaderText(null);
                         alert.setContentText("Отчет успешно создан!");
                         alert.showAndWait();
-                        //stmt.close();
-                        //con.getDbConnection().close();
                     }
             } catch (FileNotFoundException e) {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);

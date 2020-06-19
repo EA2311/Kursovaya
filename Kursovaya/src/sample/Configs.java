@@ -6,5 +6,4 @@ public class Configs {
     protected String dbUser = "root";
     protected String dbPass = "12345";
     protected String dbName = "kursovaya";
-
 }
